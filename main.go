@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"net/http"
 )
 
 type Customer struct {
@@ -37,5 +38,10 @@ var customersList = map[int]Customer{
 }
 
 func main() {
-	fmt.Println("Hello World!")
+	// Serve index.html for requests made to root
+	fileServer := http.FileServer(http.Dir("./static"))
+	http.Handle("/", fileServer)
+
+	fmt.Println("Starting server...")
+	http.ListenAndServe(":3000", nil)
 }

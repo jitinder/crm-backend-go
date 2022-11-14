@@ -1,0 +1,74 @@
+<html>
+    <title>Udacity - CRM Backend</title>
+    <style>
+        table {
+          font-family: arial, sans-serif;
+          border-collapse: collapse;
+          width: 75%;
+        }
+        
+        td, th {
+          border: 1px solid #dddddd;
+          text-align: left;
+          padding: 8px;
+        }
+
+        code {
+            font-family: Monaco, monospace;
+            line-height: 100%;
+            background-color: #eee;
+            padding: 0.2em;
+            letter-spacing: -0.05em;
+            word-break: normal;
+        }
+        </style>
+    <body>
+        <h1>API Overview</h1>
+        <p>The following endpoints are available for this API:</p>
+
+        <table>
+            <tr>
+                <th>Path</th>
+                <th>Request Type</th>
+                <th>Response Type</th>
+                <th>Description</th>
+            </tr>
+            <tr>
+                <td><code>/</code></td>
+                <td>GET</td>
+                <td>HTML</td>
+                <td>Home Page</td>
+            </tr>
+            <tr>
+                <td><code>/customers</code></td>
+                <td>GET</td>
+                <td>JSON</td>
+                <td>Get list of all customers</td>
+            </tr>
+            <tr>
+                <td><code>/customers/{id}</code></td>
+                <td>GET</td>
+                <td>JSON</td>
+                <td>Get list of customer with specified id</td>
+            </tr>
+            <tr>
+                <td><code>/customers</code></td>
+                <td>POST</td>
+                <td>JSON</td>
+                <td>Create a new customer</td>
+            </tr>
+            <tr>
+                <td><code>/customers/{id}</code></td>
+                <td>PUT</td>
+                <td>JSON</td>
+                <td>Update values for a customer with specified id</td>
+            </tr>
+            <tr>
+                <td><code>/customers/{id}</code></td>
+                <td>DELETE</td>
+                <td>JSON</td>
+                <td>Delete customer with specified id</td>
+            </tr>
+          </table>
+    </body>
+</html>

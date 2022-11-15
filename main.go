@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/gorilla/mux"
 )
@@ -46,6 +47,21 @@ func getAllCustomers(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(customersList)
 }
 
+func getCustomer(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id, err := strconv.Atoi(vars["id"])
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+	}
+	w.Header().Set("Content-Type", "application/json")
+	if _, ok := customersList[id]; ok {
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(customersList[id])
+	} else {
+		w.WriteHeader(http.StatusNotFound)
+	}
+}
+
 func main() {
 	// Initialise Router
 	router := mux.NewRouter()
@@ -54,8 +70,11 @@ func main() {
 	fileServer := http.FileServer(http.Dir("./static"))
 	http.Handle("/", fileServer)
 
-	// Get All Users
+	// Get All Customers
 	router.HandleFunc("/customers", getAllCustomers).Methods("GET")
+
+	// Get Customer by ID
+	router.HandleFunc("/customers/{id}", getCustomer).Methods("GET")
 
 	fmt.Println("Starting server...")
 	http.ListenAndServe(":3000", router)

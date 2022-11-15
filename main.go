@@ -123,7 +123,7 @@ func main() {
 
 	// Serve index.html for requests made to root
 	fileServer := http.FileServer(http.Dir("./static"))
-	http.Handle("/", fileServer)
+	router.Handle("/", fileServer).Methods("GET")
 
 	// Get All Customers
 	router.HandleFunc("/customers", getCustomers).Methods("GET")

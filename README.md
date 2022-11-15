@@ -14,4 +14,10 @@ The project represents the backend of a customer relationship management (CRM) w
 
 ## Installation Instructions
 
-TODO: How to install, launch, use and test.
+To install, clone the repository and run `go get github.com/gorilla/mux` to install the gorilla/mux package.
+
+To run the server, simple run `go run main.go` from the command line
+
+The server listens to port 3000 of your localhost
+
+Test the server by running `go test` from the command line

@@ -14,7 +14,7 @@ type Customer struct {
 	Name      string `json:"name"`
 	Role      string `json:"role"`
 	Email     string `json:"email"`
-	Phone     string `json:"phone"`
+	Phone     int    `json:"phone"`
 	Contacted bool   `json:"contacted"`
 }
 
@@ -23,21 +23,21 @@ var customersList = map[int]Customer{
 		Name:      "Andrew",
 		Role:      "User",
 		Email:     "andrew@test.com",
-		Phone:     "000000001",
+		Phone:     0000001,
 		Contacted: false,
 	},
 	2: Customer{
 		Name:      "Brian",
 		Role:      "User",
 		Email:     "brian@test.com",
-		Phone:     "000000002",
+		Phone:     0000002,
 		Contacted: false,
 	},
 	3: Customer{
 		Name:      "Carla",
 		Role:      "User",
 		Email:     "carla@test.com",
-		Phone:     "000000003",
+		Phone:     0000003,
 		Contacted: true,
 	},
 }
@@ -52,7 +52,7 @@ func getCustomer(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id, err := strconv.Atoi(vars["id"])
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
+		w.WriteHeader(http.StatusNotFound)
 	}
 	w.Header().Set("Content-Type", "application/json")
 	if _, ok := customersList[id]; ok {
@@ -65,7 +65,7 @@ func getCustomer(w http.ResponseWriter, r *http.Request) {
 
 func addCustomer(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	var newCustomer map[string]Customer
+	var newCustomer Customer
 	reqBody, _ := ioutil.ReadAll(r.Body)
 
 	err := json.Unmarshal(reqBody, &newCustomer)
@@ -74,23 +74,8 @@ func addCustomer(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	for k, v := range newCustomer {
-		key, err := strconv.Atoi(k)
-		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			return
-		}
-		if _, ok := customersList[key]; ok {
-			w.WriteHeader(http.StatusConflict)
-		} else {
-			if err != nil {
-				w.WriteHeader(http.StatusBadRequest)
-			} else {
-				customersList[key] = v
-				w.WriteHeader(http.StatusCreated)
-			}
-		}
-	}
+	customersList[len(customersList)+1] = newCustomer
+	w.WriteHeader(http.StatusCreated)
 }
 
 func updateCustomer(w http.ResponseWriter, r *http.Request) {
@@ -120,7 +105,7 @@ func deleteCustomer(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id, err := strconv.Atoi(vars["id"])
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
+		w.WriteHeader(http.StatusNotFound)
 		return
 	}
 

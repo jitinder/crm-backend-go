@@ -71,12 +71,14 @@ func createCustomer(w http.ResponseWriter, r *http.Request) {
 	err := json.Unmarshal(reqBody, &newCustomer)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
+		return
 	}
 
 	for k, v := range newCustomer {
 		key, err := strconv.Atoi(k)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
+			return
 		}
 		if _, ok := customersList[key]; ok {
 			w.WriteHeader(http.StatusConflict)
@@ -89,7 +91,29 @@ func createCustomer(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 	}
+}
 
+func updateCustomer(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id, err := strconv.Atoi(vars["id"])
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	if _, ok := customersList[id]; ok {
+		var updatedCustomer Customer
+		reqBody, _ := ioutil.ReadAll(r.Body)
+
+		err := json.Unmarshal(reqBody, &updatedCustomer)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+		}
+		customersList[id] = updatedCustomer
+		w.WriteHeader(http.StatusAccepted)
+	} else {
+		w.WriteHeader(http.StatusNotFound)
+	}
 }
 
 func main() {
@@ -108,6 +132,9 @@ func main() {
 
 	// Create new Customer
 	router.HandleFunc("/customers", createCustomer).Methods("POST")
+
+	// Update existing Customer
+	router.HandleFunc("/customers/{id}", updateCustomer).Methods("PUT")
 
 	fmt.Println("Starting server...")
 	http.ListenAndServe(":3000", router)

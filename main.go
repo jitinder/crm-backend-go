@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"strconv"
 
@@ -62,6 +63,35 @@ func getCustomer(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func createCustomer(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	var newCustomer map[string]Customer
+	reqBody, _ := ioutil.ReadAll(r.Body)
+
+	err := json.Unmarshal(reqBody, &newCustomer)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+	}
+
+	for k, v := range newCustomer {
+		key, err := strconv.Atoi(k)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+		}
+		if _, ok := customersList[key]; ok {
+			w.WriteHeader(http.StatusConflict)
+		} else {
+			if err != nil {
+				w.WriteHeader(http.StatusBadRequest)
+			} else {
+				customersList[key] = v
+				w.WriteHeader(http.StatusCreated)
+			}
+		}
+	}
+
+}
+
 func main() {
 	// Initialise Router
 	router := mux.NewRouter()
@@ -75,6 +105,9 @@ func main() {
 
 	// Get Customer by ID
 	router.HandleFunc("/customers/{id}", getCustomer).Methods("GET")
+
+	// Create new Customer
+	router.HandleFunc("/customers", createCustomer).Methods("POST")
 
 	fmt.Println("Starting server...")
 	http.ListenAndServe(":3000", router)

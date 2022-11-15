@@ -42,7 +42,7 @@ var customersList = map[int]Customer{
 	},
 }
 
-func getAllCustomers(w http.ResponseWriter, r *http.Request) {
+func getCustomers(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(customersList)
@@ -63,7 +63,7 @@ func getCustomer(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func createCustomer(w http.ResponseWriter, r *http.Request) {
+func addCustomer(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	var newCustomer map[string]Customer
 	reqBody, _ := ioutil.ReadAll(r.Body)
@@ -116,6 +116,22 @@ func updateCustomer(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func deleteCustomer(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id, err := strconv.Atoi(vars["id"])
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	if _, ok := customersList[id]; ok {
+		delete(customersList, id)
+		w.WriteHeader(http.StatusOK)
+	} else {
+		w.WriteHeader(http.StatusNotFound)
+	}
+}
+
 func main() {
 	// Initialise Router
 	router := mux.NewRouter()
@@ -125,16 +141,19 @@ func main() {
 	http.Handle("/", fileServer)
 
 	// Get All Customers
-	router.HandleFunc("/customers", getAllCustomers).Methods("GET")
+	router.HandleFunc("/customers", getCustomers).Methods("GET")
 
 	// Get Customer by ID
 	router.HandleFunc("/customers/{id}", getCustomer).Methods("GET")
 
 	// Create new Customer
-	router.HandleFunc("/customers", createCustomer).Methods("POST")
+	router.HandleFunc("/customers", addCustomer).Methods("POST")
 
 	// Update existing Customer
 	router.HandleFunc("/customers/{id}", updateCustomer).Methods("PUT")
+
+	// Delete existing Customer
+	router.HandleFunc("/customers/{id}", deleteCustomer).Methods("DELETE")
 
 	fmt.Println("Starting server...")
 	http.ListenAndServe(":3000", router)
